@@ -149,8 +149,8 @@ class Kernel(SingletonConfigurable):
         # deprecated:
         'apply_request',
     ]
-    # add deprecated ipyparallel control messages
-    control_msg_types = msg_types + ['clear_request', 'abort_request']
+    # add deprecated ipyparallel control messages, clear_request and abort_request
+    control_msg_types = msg_types + ['debug_request'] + ['clear_request', 'abort_request']
 
     def __init__(self, **kwargs):
         super(Kernel, self).__init__(**kwargs)
@@ -631,6 +631,14 @@ class Kernel(SingletonConfigurable):
         content = {'status': 'ok'}
         content.update(self.kernel_info)
         msg = self.session.send(stream, 'kernel_info_reply',
+                                content, parent, ident)
+        self.log.debug("%s", msg)
+
+    def debug_request(self, stream, ident, parent):
+        content = {'status': 'ok'}
+        # 
+
+        msg = self.session.send(stream, 'debug_reply',
                                 content, parent, ident)
         self.log.debug("%s", msg)
 
