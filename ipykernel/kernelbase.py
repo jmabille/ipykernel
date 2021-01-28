@@ -36,6 +36,8 @@ from traitlets import (
 
 from jupyter_client.session import Session
 
+from debugger import Debugger
+
 from ._version import kernel_protocol_version
 
 
@@ -162,6 +164,8 @@ class Kernel(SingletonConfigurable):
         self.control_handlers = {}
         for msg_type in self.control_msg_types:
             self.control_handlers[msg_type] = getattr(self, msg_type)
+
+        self.debugger = Debugger()
 
     @gen.coroutine
     def dispatch_control(self, msg):
@@ -635,7 +639,7 @@ class Kernel(SingletonConfigurable):
         self.log.debug("%s", msg)
 
     def debug_request(self, stream, ident, parent):
-        content = {'status': 'ok'}
+        content = self.debugger.process_request(parent['header'], parent['content'])
         # 
 
         msg = self.session.send(stream, 'debug_reply',
